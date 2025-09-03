@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reading Comprehension Adventure</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow: hidden; /* Hide scrollbars from the body */
+        }
+        #bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1; /* Place canvas behind everything */
+            background-color: #0b1120;
+        }
+        .story-content {
+            height: calc(100vh - 200px); /* Adjust height based on header/footer */
+        }
+        .question-container {
+            min-height: 400px;
+        }
+        /* Custom scrollbar for webkit browsers */
+        .prose::-webkit-scrollbar {
+            width: 8px;
+        }
+        .prose::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 10px;
+        }
+        .prose::-webkit-scrollbar-thumb {
+            background: #94a3b8;
+            border-radius: 10px;
+        }
+        .prose::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+    <canvas id="bg-animation"></canvas>
+
+    <div class="container mx-auto p-4 md:p-8 relative z-10">
+        <header class="bg-white/80 backdrop-blur-sm shadow-md rounded-lg p-6 mb-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-4 text-center">Reading Comprehension Adventure</h1>
+            <div class="flex flex-col md:flex-row gap-4">
+                <div class="flex-1">
+                    <label for="studentName" class="block text-sm font-medium text-gray-700">Student Name</label>
+                    <input type="text" id="studentName" name="studentName" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="e.g., Alex Rider">
+                </div>
+                <div class="flex-1">
+                    <label for="classHour" class="block text-sm font-medium text-gray-700">Class Hour</label>
+                    <input type="text" id="classHour" name="classHour" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="e.g., 5th Hour">
+                </div>
+            </div>
+        </header>
+
+        <main class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Story Column -->
+            <div class="bg-white/80 backdrop-blur-sm shadow-md rounded-lg p-6">
+                <h2 class="text-2xl font-semibold mb-4 border-b pb-2">Reading Passages</h2>
+                <div id="storyContainer" class="prose max-w-none overflow-y-auto story-content pr-4">
+                    <div id="passage1">
+                        <h3 class="font-bold text-lg">Passage 1: "Echoes of Kepler-186f"</h3>
+                        <p id="passage1-text">Dr. Aris Thorne considered himself more of a gardener than an explorer. For three years, his world had been the quiet hum of the biodome, the scent of terrestrial soil, and the green glow of Earth-native plants thriving under the faint red light of a distant star. His mission on Kepler-186f was simple: cultivate a sustainable food source. It was a lonely, monotonous existence, punctuated only by data logs and the silent growth of ferns and tomatoes. One cycle, while tending to a patch of mosses, he noticed a new plant—a slender, violet-hued organism with a bell-shaped flower that was unmistakably alien. Curious, he recorded its vitals, noting its strange, almost imperceptible vibration. The next day, as he hummed a half-remembered tune from his childhood, the flower's vibration changed. It began to pulse in perfect rhythm with his melody. Startled, Aris stopped. The flower fell silent. He tried again, whistling a simple scale. The flower's petals quivered, releasing faint, harmonic tones that perfectly matched his notes. Over the next few weeks, Aris conducted experiments, playing classical music, speaking, and even tapping rhythms on the dome's glass. The plant, which he named the "Echo Bloom," mimicked every sound. It wasn't just reflecting noise; it was learning, arranging the sounds into new, more complex sequences. The loneliness Aris had felt for years began to evaporate, replaced by a profound sense of wonder. He wasn't just a gardener anymore. He was a conversationalist, engaged in the first-ever dialogue with an extraterrestrial life form.</p>
+                    </div>
+                    <hr class="my-6">
+                    <div id="passage2" class="hidden">
+                         <h3 class="font-bold text-lg">Passage 2: "The Watchmaker's Secret"</h3>
+                        <p id="passage2-text">Elara inherited her estranged grandfather's watchmaking shop on a gray Tuesday. The place smelled of dust, old oil, and time itself. To her, it was a burden—a collection of tiny, useless gears and springs left by a man she barely knew. Her plan was to sell everything and move on. While sorting through a desk, she found his final project: a magnificent, unfinished pocket watch. It was a celestial map, with sapphire planets and a sun of polished brass, but the hands were missing and the mechanism was still. It felt heavier than it should. Frustrated by a stuck drawer in the desk, she idly tapped the watch against it. A tiny click echoed from within the timepiece. Intrigued, she examined it under a magnifying loupe and found a nearly invisible seam. With a watchmaker's pick, she gently pried it open. Inside, there was no complex machinery. Instead, coiled into a tight spiral, was a thin strip of paper. She carefully unrolled it. Written in her grandfather's spidery script was a message: "I spent all my time trying to capture the heavens, my dear Elara, when I should have been spending it with you. Forgive this foolish old man. My greatest treasure was the time I lost." The watch wasn't a timepiece; it was a locket, an apology frozen in gold and brass. Standing in the quiet shop, surrounded by the ghosts of ticking clocks, Elara felt the weight of her inheritance shift from a burden to a legacy. She decided not to sell. Instead, she picked up a pair of tweezers, determined to learn the craft and, perhaps, finally find the time to understand the man she had lost.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quiz Column -->
+            <div id="quizContainer" class="bg-white/80 backdrop-blur-sm shadow-md rounded-lg p-6 flex flex-col justify-between question-container">
+                 <!-- Questions will be injected here -->
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Background Animation
+        const canvas = document.getElementById('bg-animation');
+        const ctx = canvas.getContext('2d');
+        let stars = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        function createStars() {
+            stars = [];
+            let starCount = (canvas.width * canvas.height) / 10000;
+            for (let i = 0; i < starCount; i++) {
+                stars.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    radius: Math.random() * 1.5 + 0.5,
+                    vx: Math.random() * 0.2 - 0.1,
+                    vy: Math.random() * 0.2 - 0.1,
+                    alpha: Math.random() * 0.5 + 0.5
+                });
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            stars.forEach(star => {
+                star.x += star.vx;
+                star.y += star.vy;
+
+                if (star.x < 0 || star.x > canvas.width) star.vx = -star.vx;
+                if (star.y < 0 || star.y > canvas.height) star.vy = -star.vy;
+
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 255, 255, ${star.alpha})`;
+                ctx.fill();
+            });
+            requestAnimationFrame(animate);
+        }
+        
+        window.addEventListener('resize', () => {
+            resizeCanvas();
+            createStars();
+        });
+        resizeCanvas();
+        createStars();
+        animate();
+
+
+        // Quiz Logic
+        const studentNameInput = document.getElementById('studentName');
+        const classHourInput = document.getElementById('classHour');
+        const quizContainer = document.getElementById('quizContainer');
+
+        const quizData = [
+            {
+                testType: 1,
+                passage: 1,
+                question: "What is the central theme of Passage 1?",
+                options: [
+                    { text: "The challenges of farming on other planets.", feedback: "While Aris is a farmer, the story's main focus shifts from farming to the discovery of the Echo Bloom." },
+                    { text: "The discovery of communication and connection in an isolated environment.", feedback: "Correct! Aris's deep loneliness is replaced by 'a profound sense of wonder' when he realizes he can communicate with the alien plant." },
+                    { text: "The importance of music in scientific research.", feedback: "Music is the tool for discovery, but the core theme is about the connection it enables, not the music itself." },
+                    { text: "The dangers of interacting with alien life forms.", feedback: "The passage portrays the interaction as wonderful and positive, not dangerous." }
+                ],
+                correctAnswer: "The discovery of communication and connection in an isolated environment."
+            },
+            {
+                testType: 1,
+                passage: 1,
+                question: "How does Dr. Thorne's perception of his mission change throughout the story?",
+                options: [
+                    { text: "He becomes bored with gardening and wants to return to Earth.", feedback: "On the contrary, he finds a new, exciting purpose in his work on Kepler-186f." },
+                    { text: "He realizes his mission is not just about survival, but about interspecies communication.", feedback: "Excellent! He starts as a 'gardener' focused on a simple task and ends as a 'conversationalist' making a historic discovery." },
+                    { text: "He grows fearful that the alien plant could be a threat to his Earth-native plants.", feedback: "The story shows no evidence of fear, only curiosity and wonder." },
+                    { text: "He decides to abandon farming to focus solely on studying the planet's geology.", feedback: "His focus shifts to the plant, not geology. The core of his work remains with biology." }
+                ],
+                correctAnswer: "He realizes his mission is not just about survival, but about interspecies communication."
+            },
+             {
+                testType: 1,
+                passage: 1,
+                question: "What does the 'Echo Bloom' do that is so remarkable?",
+                options: [
+                    { text: "It glows in the dark, providing a new light source.", feedback: "The story doesn't mention the plant glowing; its special ability is related to sound." },
+                    { text: "It produces a new, highly nutritious food source.", feedback: "The plant's value in the story isn't as food, but as a form of communication." },
+                    { text: "It learns and rearranges sounds into new, complex sequences.", feedback: "Correct! The passage notes it wasn't just 'reflecting noise' but was actively 'learning' and creating new patterns, suggesting intelligence." },
+                    { text: "It grows much faster than any of the Earth-native plants.", feedback: "The story focuses on its sonic abilities, not its growth rate." }
+                ],
+                correctAnswer: "It learns and rearranges sounds into new, complex sequences."
+            },
+            {
+                testType: 1,
+                passage: 1,
+                question: "The word 'terrestrial' in the first paragraph most nearly means:",
+                options: [
+                    { text: "Alien and unusual.", feedback: "This is the opposite of the correct meaning. 'Terrestrial' relates to Earth." },
+                    { text: "Relating to the planet Earth.", feedback: "Correct! The passage contrasts the 'terrestrial soil' and 'Earth-native plants' with the alien environment of Kepler-186f." },
+                    { text: "Extremely boring.", feedback: "While his life was monotonous, 'terrestrial' itself is a scientific term referring to Earth." },
+                    { text: "Brightly colored.", feedback: "This word describes origin, not appearance." }
+                ],
+                correctAnswer: "Relating to the planet Earth."
+            },
+            {
+                testType: 1,
+                passage: 1,
+                question: "What is the primary cause of Aris's change in feelings from loneliness to wonder?",
+                options: [
+                    { text: "He successfully grows tomatoes far from Earth.", feedback: "While an achievement, the story emphasizes that his life was still monotonous. The real change comes from the alien plant." },
+                    { text: "He receives a message from mission control.", feedback: "The story highlights his isolation; there's no mention of contact with others." },
+                    { text: "He realizes he is no longer alone in a meaningful sense.", feedback: "This is the core of his transformation. The ability to communicate with the Echo Bloom ends his profound isolation." },
+                    { text: "He discovers that the planet's atmosphere is breathable.", feedback: "He remains inside the biodome, so this is not a factor in the story." }
+                ],
+                correctAnswer: "He realizes he is no longer alone in a meaningful sense."
+            },
+            {
+                testType: 2,
+                passage: 2,
+                question: "Which sentence best summarizes Passage 2?",
+                options: [
+                    "A young woman sells her grandfather's old shop to pay off her debts.",
+                    "A skilled watchmaker teaches her granddaughter the family trade through a series of letters.",
+                    "A young woman inherits what she believes is a burden, only to discover a heartfelt message that changes her perspective.",
+                    "An antique dealer discovers a rare and valuable celestial watch in a dusty, abandoned shop."
+                ],
+                correctAnswer: "A young woman inherits what she believes is a burden, only to discover a heartfelt message that changes her perspective.",
+                feedback: "The correct answer is C. This accurately covers the main points: Elara's initial negative feelings ('burden'), the key discovery (the message), and her resulting change of heart ('changes her perspective')."
+            },
+            {
+                testType: 2,
+                passage: 2,
+                question: "What does the unfinished pocket watch symbolize?",
+                options: [
+                    "The grandfather's failure as a watchmaker.",
+                    "The valuable and rare nature of the shop's inventory.",
+                    "The time the grandfather wished he had spent with his granddaughter.",
+                    "Elara's inability to understand her grandfather's work."
+                ],
+                correctAnswer: "The time the grandfather wished he had spent with his granddaughter.",
+                feedback: "The correct answer is C. The message inside explicitly states, 'My greatest treasure was the time I lost.' The unfinished state of the watch mirrors this lost time and his regret."
+            },
+            {
+                testType: 2,
+                passage: 2,
+                question: "Why does Elara decide not to sell the shop at the end of the story?",
+                options: [
+                    "She realizes the watches are worth a fortune.",
+                    "She discovers she has a natural talent for watchmaking.",
+                    "She feels a newfound connection to her grandfather and wants to understand his legacy.",
+                    "She has nowhere else to go and decides to live in the shop."
+                ],
+                correctAnswer: "She feels a newfound connection to her grandfather and wants to understand his legacy.",
+                feedback: "The correct answer is C. The grandfather's apology transforms the shop from a 'burden to a legacy.' Her decision to learn the craft is a way to connect with the man she never knew."
+            },
+            {
+                testType: 2,
+                passage: 2,
+                question: "What is the significance of the watch being a 'locket' instead of a functional timepiece?",
+                options: [
+                    "It shows that the grandfather was not a very skilled craftsman.",
+                    "It highlights that the object's true purpose was to hold a message of love, not to tell time.",
+                    "It proves that the watch was stolen and its internal parts were sold.",
+                    "It suggests that time had stopped for the grandfather when Elara was born."
+                ],
+                correctAnswer: "It highlights that the object's true purpose was to hold a message of love, not to tell time.",
+                feedback: "The correct answer is B. By hiding a message inside instead of gears, the grandfather prioritized his personal expression of regret over the watch's function. Its value is emotional, not mechanical."
+            },
+            {
+                testType: 2,
+                passage: 'Both',
+                question: "How are the main characters in both passages similar?",
+                options: [
+                    "Both are scientists working on projects that will save humanity.",
+                    "Both feel trapped by their circumstances but find a new purpose through an unexpected discovery.",
+                    "Both inherit a family business and must decide whether to keep it.",
+                    "Both are trying to communicate with someone from their past."
+                ],
+                correctAnswer: "Both feel trapped by their circumstances but find a new purpose through an unexpected discovery.",
+                feedback: "The correct answer is B. Aris is trapped by the monotony and isolation of his mission on Kepler-186f. Elara feels trapped by the burden of an unwanted inheritance. Both of their perspectives are completely changed by their respective discoveries (the Echo Bloom and the hidden message)."
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let userAnswers = {};
+        
+        function updateVisiblePassage(passage) {
+            const passage1Div = document.getElementById('passage1');
+            const passage2Div = document.getElementById('passage2');
+            const hrSeparator = document.querySelector('#passage1 + hr');
+
+            passage1Div.classList.add('hidden');
+            passage2Div.classList.add('hidden');
+            hrSeparator.classList.add('hidden');
+
+            if (passage === 1) {
+                passage1Div.classList.remove('hidden');
+            } else if (passage === 2) {
+                passage2Div.classList.remove('hidden');
+            } else if (passage === 'Both') {
+                passage1Div.classList.remove('hidden');
+                passage2Div.classList.remove('hidden');
+                hrSeparator.classList.remove('hidden');
+            }
+        }
+
+        function showTransitionScreen() {
+            quizContainer.innerHTML = `
+                <div class="text-center">
+                    <h2 class="text-2xl font-bold mb-4">Practice Complete</h2>
+                    <p class="text-gray-700 mb-6">You have completed the first part of the assessment. When you are ready, please proceed to the final part. This section will not provide immediate feedback.</p>
+                </div>
+                <button id="startTest2Button" class="w-full p-3 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    Start Final Assessment
+                </button>
+            `;
+            document.getElementById('startTest2Button').addEventListener('click', displayQuestion);
+        }
+
+        function displayQuestion() {
+            if (currentQuestionIndex >= quizData.length) {
+                showFinalScreen();
+                return;
+            }
+
+            const questionData = quizData[currentQuestionIndex];
+            updateVisiblePassage(questionData.passage);
+            
+            let testTitle = questionData.testType === 1 ? 'Part 1: Practice with Feedback' : 'Part 2: Final Assessment';
+            
+            quizContainer.innerHTML = `
+                <div>
+                    <h2 class="text-xl font-semibold mb-2">${testTitle}</h2>
+                    <p class="text-md text-gray-700 mb-4">${questionData.question}</p>
+                    <div id="optionsContainer" class="space-y-3">
+                        ${questionData.options.map((option, index) => `
+                            <button data-index="${index}" class="w-full text-left p-3 bg-gray-200/50 rounded-lg hover:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-colors duration-200">
+                                <span class="font-bold mr-2">${String.fromCharCode(65 + index)}.</span> ${option.text || option}
+                            </button>
+                        `).join('')}
+                    </div>
+                </div>
+                <div class="mt-6">
+                    <div id="feedbackContainer" class="p-4 rounded-lg hidden"></div>
+                    <div class="text-right mt-4">
+                        <span class="text-sm text-gray-500">Question ${currentQuestionIndex + 1} of ${quizData.length}</span>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('optionsContainer').addEventListener('click', (event) => {
+                const button = event.target.closest('button');
+                if (button) {
+                    handleAnswer(parseInt(button.dataset.index));
+                }
+            });
+        }
+        
+        function handleAnswer(selectedIndex) {
+            const questionData = quizData[currentQuestionIndex];
+            const selectedOption = questionData.options[selectedIndex];
+            const selectedAnswerText = selectedOption.text || selectedOption;
+            userAnswers[currentQuestionIndex] = selectedAnswerText;
+
+            if (questionData.testType === 1) {
+                const isCorrect = selectedAnswerText === questionData.correctAnswer;
+                const feedbackContainer = document.getElementById('feedbackContainer');
+                
+                feedbackContainer.innerHTML = selectedOption.feedback;
+                feedbackContainer.classList.remove('hidden', 'bg-green-100', 'text-green-800', 'bg-red-100', 'text-red-800');
+
+                if (isCorrect) {
+                    feedbackContainer.classList.add('bg-green-100', 'text-green-800');
+                    document.querySelectorAll('#optionsContainer button').forEach(btn => {
+                        btn.disabled = true;
+                        btn.classList.add('opacity-70');
+                    });
+                     document.querySelector(`#optionsContainer button[data-index='${selectedIndex}']`).classList.add('bg-green-200');
+                    feedbackContainer.innerHTML += `<button id="nextButton" class="block w-full mt-4 p-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Next Question</button>`;
+                    document.getElementById('nextButton').addEventListener('click', () => {
+                        const previousTestType = quizData[currentQuestionIndex].testType;
+                        currentQuestionIndex++;
+                        if (currentQuestionIndex < quizData.length && quizData[currentQuestionIndex].testType !== previousTestType) {
+                            showTransitionScreen();
+                        } else {
+                            displayQuestion();
+                        }
+                    });
+
+                } else {
+                    feedbackContainer.classList.add('bg-red-100', 'text-red-800');
+                    const selectedButton = document.querySelector(`#optionsContainer button[data-index='${selectedIndex}']`);
+                    selectedButton.classList.add('bg-red-200');
+                    selectedButton.disabled = true;
+                }
+            } else {
+                currentQuestionIndex++;
+                displayQuestion();
+            }
+        }
+
+        function showFinalScreen() {
+             quizContainer.innerHTML = `
+                <div>
+                    <h2 class="text-2xl font-bold mb-4">Assessment Complete</h2>
+                    <p class="text-gray-700 mb-6">You have answered all the questions. Click the button below to submit your answers and view your report.</p>
+                </div>
+                <button id="submitGradeButton" class="w-full p-3 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                    Submit & View Report
+                </button>
+            `;
+            document.getElementById('submitGradeButton').addEventListener('click', gradeAndSubmit);
+        }
+
+        function gradeAndSubmit() {
+            const studentName = studentNameInput.value.trim();
+            if (!studentName) {
+                const header = document.querySelector('header');
+                let errorMsg = document.getElementById('nameError');
+                if (!errorMsg) {
+                    errorMsg = document.createElement('p');
+                    errorMsg.id = 'nameError';
+                    errorMsg.className = 'text-red-600 text-center mt-2 font-semibold';
+                    header.appendChild(errorMsg);
+                }
+                errorMsg.textContent = 'Please enter your name before submitting.';
+                studentNameInput.focus();
+                studentNameInput.classList.add('border-red-500', 'ring-red-500');
+                return;
+            }
+            const nameError = document.getElementById('nameError');
+            if(nameError) nameError.remove();
+            studentNameInput.classList.remove('border-red-500', 'ring-red-500');
+
+            const classHour = classHourInput.value.trim() || "N/A";
+            let score = 0;
+            let report = '';
+
+            quizData.forEach((q, index) => {
+                const userAnswer = userAnswers[index];
+                const isCorrect = userAnswer === q.correctAnswer;
+                if (isCorrect) score++;
+
+                if (q.testType === 2) {
+                    const userOptionIndex = q.options.findIndex(opt => (opt.text || opt) === userAnswer);
+                    const correctOptionIndex = q.options.findIndex(opt => (opt.text || opt) === q.correctAnswer);
+                    const userAnswerLetter = userOptionIndex > -1 ? String.fromCharCode(65 + userOptionIndex) : '';
+                    const correctAnswerLetter = correctOptionIndex > -1 ? String.fromCharCode(65 + correctOptionIndex) : '';
+                    const formattedUserAnswer = userAnswer ? `${userAnswerLetter}. ${userAnswer}` : 'Not answered';
+                    const formattedCorrectAnswer = `${correctAnswerLetter}. ${q.correctAnswer}`;
+
+                    report += `
+                        <div class="mb-6 p-4 rounded-lg ${isCorrect ? 'bg-green-50' : 'bg-red-50'} border ${isCorrect ? 'border-green-200' : 'border-red-200'}">
+                            <p class="font-semibold text-gray-800">Question ${index + 1}: ${q.question}</p>
+                            <p class="mt-2 text-sm">Your answer: <span class="${isCorrect ? 'text-green-700 font-bold' : 'text-red-700 font-bold'}">${formattedUserAnswer}</span></p>
+                            <p class="mt-1 text-sm">Correct answer: <span class="text-green-700 font-bold">${formattedCorrectAnswer}</span></p>
+                            <div class="mt-2 pt-2 border-t border-gray-200">
+                                <p class="text-sm text-gray-600"><span class="font-semibold">Feedback:</span> ${q.feedback}</p>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+
+            const totalScore = ((score / quizData.length) * 100).toFixed(0);
+
+            quizContainer.innerHTML = `
+                <div>
+                    <h2 class="text-2xl font-bold mb-2">Grading Report for ${studentName}</h2>
+                    <p class="text-lg font-medium mb-4">Final Score: ${score} out of ${quizData.length} (${totalScore}%)</p>
+                    <h3 class="text-xl font-semibold mb-3">Assessment Feedback:</h3>
+                    <div id="report-container" class="overflow-y-auto" style="max-height: 300px; padding-right: 1rem;">${report}</div>
+                </div>
+                 <div class="mt-6 flex flex-col items-center gap-4">
+                    <button onclick="generateFile('${studentName}', '${classHour}', '${totalScore}')" class="w-full max-w-xs p-2 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        Download Report
+                    </button>
+                </div>
+            `;
+        }
+
+        function generateFile(studentName, classHour, score) {
+            const passage1Text = document.getElementById('passage1-text').textContent;
+            const passage2Text = document.getElementById('passage2-text').textContent;
+            let fileContent = `Reading Comprehension Assessment Report\n=========================================\n\nStudent: ${studentName}\nClass Hour: ${classHour}\nFinal Score: ${score}%\n\n--- Reading Passages ---\n\nPassage 1: "Echoes of Kepler-186f"\n${passage1Text}\n\nPassage 2: "The Watchmaker's Secret"\n${passage2Text}\n\n--- Student Selections ---\n\n`;
+            quizData.forEach((q, index) => {
+                const userAnswer = userAnswers[index];
+                const correctAnsw = q.correctAnswer;
+                const userOptionIndex = q.options.findIndex(opt => (opt.text || opt) === userAnswer);
+                const correctOptionIndex = q.options.findIndex(opt => (opt.text || opt) === correctAnsw);
+                const userAnswerLetter = userOptionIndex > -1 ? `${String.fromCharCode(65 + userOptionIndex)}. ` : '';
+                const correctAnswerLetter = correctOptionIndex > -1 ? `${String.fromCharCode(65 + correctOptionIndex)}. ` : '';
+                fileContent += `Question ${index + 1}: ${q.question}\n   Selected Answer: ${userAnswerLetter}${userAnswers[index] || 'Not answered'}\n   Correct Answer: ${correctAnswerLetter}${q.correctAnswer}\n\n`;
+            });
+            const blob = new Blob([fileContent], { type: 'text/plain' });
+            const anchor = document.createElement('a');
+            anchor.download = `${studentName.replace(/\s/g, '_')}_Reading_Report.txt`;
+            anchor.href = window.URL.createObjectURL(blob);
+            anchor.click();
+            window.URL.revokeObjectURL(anchor.href);
+        }
+        
+        displayQuestion();
+    </script>
+</body>
+</html>
